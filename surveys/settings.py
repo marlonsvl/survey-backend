@@ -153,7 +153,7 @@ WSGI_APPLICATION = 'surveys.wsgi.application'
 """
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgresql://survey_db_1z74_user:R3hoLfD1swJaRu1iG6eciF1m66RAx9e0@dpg-d4etm74hg0os73fn6n80-a/survey_db_1z74",
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
         ssl_require=True
     )
