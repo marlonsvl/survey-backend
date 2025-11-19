@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,8 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', cast=bool)
+#SECRET_KEY = config('SECRET_KEY')
+#DEBUG = config('DEBUG', cast=bool)
+import os
+SECRET_KEY = os.getenv("SECRET_KEY", "sdfgty678&123@09ijGHT")
+DEBUG = os.getenv("DEBUG", "False") == "True"
+
+
+
 #ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(',')
 
 CORS_ALLOWED_ORIGINS = [
@@ -64,12 +71,7 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # Allow Render domain
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '10.0.2.2',
-    '.onrender.com',  # All Render subdomains
-]
+ALLOWED_HOSTS = ['*']
 
 # Security settings for production
 if not DEBUG:
@@ -136,7 +138,9 @@ WSGI_APPLICATION = 'surveys.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
+
+##########
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('DB_NAME'),
@@ -145,6 +149,14 @@ DATABASES = {
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
     }
+}
+"""
+DATABASES = {
+    "default": dj_database_url.config(
+        default="postgresql://survey_db_1z74_user:R3hoLfD1swJaRu1iG6eciF1m66RAx9e0@dpg-d4etm74hg0os73fn6n80-a/survey_db_1z74",
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 REST_FRAMEWORK = {
