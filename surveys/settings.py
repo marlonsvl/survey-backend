@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #SECRET_KEY = config('SECRET_KEY')
 #DEBUG = config('DEBUG', cast=bool)
 import os
-SECRET_KEY = os.getenv("SECRET_KEY", "sdfgty678&123@09ijGHT")
+SECRET_KEY = os.getenv("SECRET_KEY", "asdf567&908-ADDF34")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
 
