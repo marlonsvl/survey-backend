@@ -8,7 +8,62 @@ class Participant(models.Model):
         ('EC', 'Ecuador'),
         ('CL', 'Chile'),
     ]
-    
+    GENDER_CHOICES = [
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+        ('O', 'Otro'),
+    ]
+    LIVING_WITH_CHOICES = [
+        ('alone', 'Solo/a'),
+        ('mother', 'Con mamá'),
+        ('father', 'Con papá'),
+        ('both_parents', 'Con ambos padres'),
+        ('parents_siblings', 'Con padres y hermanos'),
+        ('parents_siblings_grandparents', 'Con padres, hermanos y abuelos'),
+        ('extended_family', 'Con padres, hermanos, abuelos y tíos'),
+        ('other', 'Otros'),
+    ]
+    MARITAL_STATUS_CHOICES = [
+        ('single', 'Soltero/a'),
+        ('married', 'Casado/a'),
+        ('free_union', 'Unión libre'),
+        ('divorced', 'Divorciado/a'),
+        ('widowed', 'Viudo/a'),
+        ('separated', 'Separado/a'),
+    ]
+    SOCIOECONOMIC_CHOICES = [
+        ('high', 'Alto'),
+        ('medium', 'Medio'),
+        ('low', 'Bajo'),
+    ]
+    RESIDENCE_SECTOR_CHOICES = [
+        ('urban', 'Urbano'),
+        ('rural', 'Rural'),
+    ]
+
+    EDUCATION_CHOICES = [
+        ('none', 'Ninguno'),
+        ('primary', 'Primaria'),
+        ('secondary', 'Secundaria'),
+        ('college', 'Superior'),
+        ('postgraduate', 'Postgrado'),
+    ]
+
+    SEMESTER = [
+        ('1', 'Semestre 1'),
+        ('2', 'Semestre 2'),
+        ('3', 'Semestre 3'),
+        ('4', 'Semestre 4'),
+        ('5', 'Semestre 5'),
+        ('6', 'Semestre 6'),
+        ('7', 'Semestre 7'),
+        ('8', 'Semestre 8'),
+        ('9', 'Semestre 9'),
+        ('10', 'Semestre 10'),
+        ('11', 'Semestre 11'),
+        ('12', 'Semestre 12'),]
+
+
     email = models.EmailField(unique=True, validators=[EmailValidator()])
     location = models.CharField(max_length=2, choices=LOCATION_CHOICES, default='--')
     consent_accepted = models.BooleanField(default=True)
@@ -16,6 +71,29 @@ class Participant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     feedback_sent = models.BooleanField(default=False)
+
+
+    # Sociodemographic information
+    country = models.CharField(max_length=100, null=True, blank=True)
+    age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
+    gender_other = models.CharField(max_length=100, null=True, blank=True)
+    living_with = models.CharField(max_length=50, choices=LIVING_WITH_CHOICES, null=True, blank=True)
+    living_with_other = models.CharField(max_length=200, null=True, blank=True)
+    university = models.CharField(max_length=200, null=True, blank=True)
+    career = models.CharField(max_length=200, null=True, blank=True)
+    current_semester = models.CharField(max_length=50, choices=SEMESTER, null=True, blank=True)
+    marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, null=True, blank=True)
+    mother_education_level = models.CharField(max_length=200, choices=EDUCATION_CHOICES, null=True, blank=True)
+    father_education_level = models.CharField(max_length=200, choices=EDUCATION_CHOICES, null=True, blank=True)
+    mother_age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
+    father_age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
+    gpa_last_semester = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    repeated_cycles = models.BooleanField(default=False)
+    repeated_cycles_count = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
+    residence_sector = models.CharField(max_length=20, choices=RESIDENCE_SECTOR_CHOICES, null=True, blank=True)
+    socioeconomic_level = models.CharField(max_length=20, choices=SOCIOECONOMIC_CHOICES, null=True, blank=True)
+    income_sources = models.CharField(max_length=500, null=True, blank=True)  # Comma-separated or JSON
     
     class Meta:
         db_table = 'participants'
