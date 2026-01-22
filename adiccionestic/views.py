@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
+import openpyxl
 from .models import (
     Participant, BergenTikTok, BergenInstagram,
     UCLALoneliness, PrefrontalSymptoms, CAIDS
