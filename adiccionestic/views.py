@@ -5,6 +5,8 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
 import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment
+from datetime import datetime
 from .models import (
     Participant, BergenTikTok, BergenInstagram,
     UCLALoneliness, PrefrontalSymptoms, CAIDS
