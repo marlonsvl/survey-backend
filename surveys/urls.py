@@ -20,4 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('adiccionestic.urls')),
+    path('export/', ExportInterfaceView.as_view(), name='export-interface'),
 ]

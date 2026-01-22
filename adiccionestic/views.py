@@ -15,6 +15,11 @@ from .serializers import (
     CAIDSSerializer
 )
 
+from django.views.generic import TemplateView
+
+class ExportInterfaceView(TemplateView):
+    template_name = 'export_interface.html'
+
 
 class SurveyViewSet(viewsets.ModelViewSet):
     queryset = Participant.objects.all()
@@ -52,6 +57,313 @@ class SurveyViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
     
+    @action(detail=False, methods=['get'])
+    def export_excel(self, request):
+        """Export all survey data to Excel"""
+        # Get filter parameters
+        location = request.query_params.get('location', None)
+        start_date = request.query_params.get('start_date', None)
+        end_date = request.query_params.get('end_date', None)
+        
+        # Build queryset
+        queryset = Participant.objects.all()
+        
+        if location:
+            queryset = queryset.filter(location=location)
+        
+        if start_date:
+            queryset = queryset.filter(created_at__gte=start_date)
+        
+        if end_date:
+            queryset = queryset.filter(created_at__lte=end_date)
+        
+        # Generate Excel file
+        return self._generate_excel_export(queryset)
+
+    @action(detail=True, methods=['get'])
+    def export_participant(self, request, email=None):
+        """Export single participant data to Excel"""
+        try:
+            participant = Participant.objects.get(email=email)
+            queryset = Participant.objects.filter(email=email)
+            return self._generate_excel_export(queryset)
+        except Participant.DoesNotExist:
+            return Response(
+                {'error': 'Participante no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+    @action(detail=False, methods=['get'])
+    def statistics(self, request):
+        """Get summary statistics of survey data"""
+        total_participants = Participant.objects.count()
+        
+        stats = {
+            'total_participants': total_participants,
+            'by_location': {},
+            'by_gender': {},
+            'instruments': {},
+            'feedback_sent': Participant.objects.filter(feedback_sent=True).count(),
+        }
+        
+        # Location stats
+        for code, name in Participant.LOCATION_CHOICES:
+            count = Participant.objects.filter(location=code).count()
+            stats['by_location'][name] = {
+                'count': count,
+                'percentage': round(count / total_participants * 100, 2) if total_participants > 0 else 0
+            }
+        
+        # Gender stats
+        for code, name in Participant.GENDER_CHOICES:
+            count = Participant.objects.filter(gender=code).count()
+            if count > 0:
+                stats['by_gender'][name] = {
+                    'count': count,
+                    'percentage': round(count / total_participants * 100, 2) if total_participants > 0 else 0
+                }
+        
+        # Instrument completion stats
+        instruments = [
+            ('bergen_tiktok', 'Bergen TikTok'),
+            ('bergen_instagram', 'Bergen Instagram'),
+            ('ucla_loneliness', 'UCLA Loneliness'),
+            ('prefrontal_symptoms', 'Prefrontal Symptoms'),
+            ('caids', 'CAIDS'),
+        ]
+        
+        for attr, name in instruments:
+            count = sum(1 for p in Participant.objects.all() if hasattr(p, attr))
+            stats['instruments'][name] = {
+                'count': count,
+                'percentage': round(count / total_participants * 100, 2) if total_participants > 0 else 0
+            }
+        
+        return Response(stats)
+    
+    def _generate_excel_export(self, queryset):
+        """Generate Excel file with survey data"""
+        # Create workbook
+        wb = openpyxl.Workbook()
+        wb.remove(wb.active)
+        
+        # Create sheets
+        self._create_participants_sheet(wb, queryset)
+        self._create_bergen_tiktok_sheet(wb, queryset)
+        self._create_bergen_instagram_sheet(wb, queryset)
+        self._create_ucla_loneliness_sheet(wb, queryset)
+        self._create_prefrontal_symptoms_sheet(wb, queryset)
+        self._create_caids_sheet(wb, queryset)
+        self._create_summary_sheet(wb, queryset)
+        
+        # Prepare response
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        response['Content-Disposition'] = f'attachment; filename=survey_export_{timestamp}.xlsx'
+        
+        wb.save(response)
+        return response
+    
+    def _create_participants_sheet(self, wb, queryset):
+        """Create participants data sheet"""
+        ws = wb.create_sheet("Participants")
+        
+        headers = [
+            'Email', 'Location', 'Country', 'Age', 'Gender', 'Gender Other',
+            'Living With', 'Living With Other', 'University', 'Career',
+            'Current Semester', 'Marital Status', 'Mother Education',
+            'Father Education', 'Mother Age', 'Father Age', 'GPA Last Semester',
+            'Repeated Cycles', 'Repeated Cycles Count', 'Residence Sector',
+            'Socioeconomic Level', 'Income Sources', 'Consent Accepted',
+            'Consent Date', 'Feedback Sent', 'Created At'
+        ]
+        
+        self._write_header_row(ws, headers)
+        
+        for participant in queryset:
+            row = [
+                participant.email,
+                participant.get_location_display(),
+                participant.country or '',
+                participant.age or '',
+                participant.get_gender_display() if participant.gender else '',
+                participant.gender_other or '',
+                participant.get_living_with_display() if participant.living_with else '',
+                participant.living_with_other or '',
+                participant.university or '',
+                participant.career or '',
+                participant.get_current_semester_display() if participant.current_semester else '',
+                participant.get_marital_status_display() if participant.marital_status else '',
+                participant.get_mother_education_level_display() if participant.mother_education_level else '',
+                participant.get_father_education_level_display() if participant.father_education_level else '',
+                participant.mother_age or '',
+                participant.father_age or '',
+                float(participant.gpa_last_semester) if participant.gpa_last_semester else '',
+                'Yes' if participant.repeated_cycles else 'No',
+                participant.repeated_cycles_count or '',
+                participant.get_residence_sector_display() if participant.residence_sector else '',
+                participant.get_socioeconomic_level_display() if participant.socioeconomic_level else '',
+                participant.income_sources or '',
+                'Yes' if participant.consent_accepted else 'No',
+                participant.consent_date.strftime('%Y-%m-%d %H:%M:%S') if participant.consent_date else '',
+                'Yes' if participant.feedback_sent else 'No',
+                participant.created_at.strftime('%Y-%m-%d %H:%M:%S') if participant.created_at else '',
+            ]
+            ws.append(row)
+        
+        self._auto_adjust_columns(ws)
+    
+    def _create_bergen_tiktok_sheet(self, wb, queryset):
+        """Create Bergen TikTok sheet"""
+        ws = wb.create_sheet("Bergen TikTok")
+        
+        headers = [
+            'Email', 'Q1 Salience', 'Q2 Tolerance', 'Q3 Mood Modification',
+            'Q4 Relapse', 'Q5 Withdrawal', 'Q6 Conflict', 'Total Score',
+            'Feedback', 'Created At'
+        ]
+        
+        self._write_header_row(ws, headers)
+        
+        for participant in queryset:
+            if hasattr(participant, 'bergen_tiktok'):
+                bt = participant.bergen_tiktok
+                ws.append([
+                    participant.email, bt.q1_salience, bt.q2_tolerance,
+                    bt.q3_mood_modification, bt.q4_relapse, bt.q5_withdrawal,
+                    bt.q6_conflict, bt.total_score, bt.get_feedback(),
+                    bt.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                ])
+        
+        self._auto_adjust_columns(ws)
+    
+    def _create_bergen_instagram_sheet(self, wb, queryset):
+        """Create Bergen Instagram sheet"""
+        ws = wb.create_sheet("Bergen Instagram")
+        
+        headers = [
+            'Email', 'Q1 Salience', 'Q2 Tolerance', 'Q3 Mood Modification',
+            'Q4 Relapse', 'Q5 Withdrawal', 'Q6 Conflict', 'Total Score',
+            'Feedback', 'Created At'
+        ]
+        
+        self._write_header_row(ws, headers)
+        
+        for participant in queryset:
+            if hasattr(participant, 'bergen_instagram'):
+                bi = participant.bergen_instagram
+                ws.append([
+                    participant.email, bi.q1_salience, bi.q2_tolerance,
+                    bi.q3_mood_modification, bi.q4_relapse, bi.q5_withdrawal,
+                    bi.q6_conflict, bi.total_score, bi.get_feedback(),
+                    bi.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                ])
+        
+        self._auto_adjust_columns(ws)
+    
+    def _create_ucla_loneliness_sheet(self, wb, queryset):
+        """Create UCLA Loneliness sheet"""
+        ws = wb.create_sheet("UCLA Loneliness")
+        
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 21)] + ['Total Score', 'Feedback', 'Created At']
+        self._write_header_row(ws, headers)
+        
+        for participant in queryset:
+            if hasattr(participant, 'ucla_loneliness'):
+                ul = participant.ucla_loneliness
+                row = [participant.email]
+                row.extend([getattr(ul, f'q{i}') for i in range(1, 21)])
+                row.extend([
+                    ul.total_score, ul.get_feedback(),
+                    ul.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                ])
+                ws.append(row)
+        
+        self._auto_adjust_columns(ws)
+    
+    def _create_prefrontal_symptoms_sheet(self, wb, queryset):
+        """Create Prefrontal Symptoms sheet"""
+        ws = wb.create_sheet("Prefrontal Symptoms")
+        
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 21)] + ['Total Score', 'Feedback', 'Created At']
+        self._write_header_row(ws, headers)
+        
+        for participant in queryset:
+            if hasattr(participant, 'prefrontal_symptoms'):
+                ps = participant.prefrontal_symptoms
+                row = [participant.email]
+                row.extend([getattr(ps, f'q{i}') for i in range(1, 21)])
+                row.extend([
+                    ps.total_score, ps.get_feedback(),
+                    ps.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                ])
+                ws.append(row)
+        
+        self._auto_adjust_columns(ws)
+    
+    def _create_caids_sheet(self, wb, queryset):
+        """Create CAIDS sheet"""
+        ws = wb.create_sheet("CAIDS")
+        
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 14)] + ['Total Score', 'Feedback', 'Created At']
+        self._write_header_row(ws, headers)
+        
+        for participant in queryset:
+            if hasattr(participant, 'caids'):
+                caids = participant.caids
+                row = [participant.email]
+                row.extend([getattr(caids, f'q{i}') for i in range(1, 14)])
+                row.extend([
+                    caids.total_score, caids.get_feedback(),
+                    caids.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                ])
+                ws.append(row)
+        
+        self._auto_adjust_columns(ws)
+    
+    def _create_summary_sheet(self, wb, queryset):
+        """Create summary sheet"""
+        ws = wb.create_sheet("Summary", 0)
+        
+        ws['A1'] = 'SURVEY DATA EXPORT'
+        ws['A1'].font = Font(size=16, bold=True)
+        
+        ws['A3'] = 'Export Date:'
+        ws['B3'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        ws['A4'] = 'Total Records:'
+        ws['B4'] = queryset.count()
+        
+        self._auto_adjust_columns(ws)
+    
+    def _write_header_row(self, ws, headers):
+        """Write styled header row"""
+        ws.append(headers)
+        
+        header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
+        header_font = Font(color='FFFFFF', bold=True)
+        
+        for cell in ws[1]:
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+    
+    def _auto_adjust_columns(self, ws):
+        """Auto-adjust column widths"""
+        for column in ws.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            
+            adjusted_width = min(max_length + 2, 50)
+            ws.column_dimensions[column_letter].width = adjusted_width
+
     def generate_feedback(self, participant):
         """Generate feedback for all completed instruments"""
         feedback = {
