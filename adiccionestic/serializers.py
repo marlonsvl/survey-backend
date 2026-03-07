@@ -46,7 +46,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Participant
         fields = [
-            'email', 'location', 'consent_accepted',
+            'email', 'location', 'city', 'consent_accepted',
             # Sociodemographic fields
             'country', 'age', 'gender', 'gender_other',
             'living_with', 'living_with_other',

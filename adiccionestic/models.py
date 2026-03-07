@@ -75,7 +75,7 @@ class Participant(models.Model):
 
     # Sociodemographic information
     country = models.CharField(max_length=100, null=True, blank=True)
-    #city = models.CharField(max_length=100, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     gender_other = models.CharField(max_length=100, null=True, blank=True)
