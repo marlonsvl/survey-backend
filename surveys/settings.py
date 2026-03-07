@@ -140,7 +140,7 @@ WSGI_APPLICATION = 'surveys.wsgi.application'
 
 
 ##########
-DATABASES = {
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('DB_NAME'),
@@ -149,15 +149,15 @@ DATABASES = {
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
     }
-}
+}"""
 
-"""DATABASES = {
+DATABASES = {
     "default": dj_database_url.config(
         default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
         ssl_require=True
     )
-}"""
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],  # No authentication for now
