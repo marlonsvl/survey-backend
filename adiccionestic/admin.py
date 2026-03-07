@@ -13,7 +13,7 @@ from .models import (
 
 
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ['email', 'location', 'age', 'gender', 'university', 'consent_accepted', 'created_at', 'feedback_sent', 'export_button']
+    list_display = ['email', 'location', 'city', 'age', 'gender', 'university', 'consent_accepted', 'created_at', 'feedback_sent', 'export_button']
     search_fields = ['email', 'country', 'university']
     list_filter = ['location', 'gender', 'marital_status', 'residence_sector', 'socioeconomic_level', 'consent_accepted', 'feedback_sent', 'created_at']
     readonly_fields = ['created_at', 'updated_at', 'consent_date']
@@ -21,7 +21,7 @@ class ParticipantAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Contact Information', {
-            'fields': ('email', 'location', 'country')
+            'fields': ('email', 'location', 'city', 'country')
         }),
         ('Consent', {
             'fields': ('consent_accepted', 'consent_date')
@@ -119,7 +119,7 @@ class ParticipantAdmin(admin.ModelAdmin):
         
         # Headers
         headers = [
-            'Email', 'Location', 'Country', 'Age', 'Gender', 'Gender Other',
+            'Email', 'Location', 'City', 'Country', 'Age', 'Gender', 'Gender Other',
             'Living With', 'Living With Other', 'University', 'Career',
             'Current Semester', 'Marital Status', 'Mother Education',
             'Father Education', 'Mother Age', 'Father Age', 'GPA Last Semester',
