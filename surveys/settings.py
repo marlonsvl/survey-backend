@@ -85,7 +85,6 @@ if not DEBUG:
 
 
 
-
 # Application definition
 
 INSTALLED_APPS = [

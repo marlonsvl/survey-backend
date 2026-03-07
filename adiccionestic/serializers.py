@@ -48,7 +48,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
         fields = [
             'email', 'location', 'consent_accepted',
             # Sociodemographic fields
-            'country', 'city', 'age', 'gender', 'gender_other',
+            'country', 'age', 'gender', 'gender_other',
             'living_with', 'living_with_other',
             'university', 'career', 'current_semester',
             'marital_status',
