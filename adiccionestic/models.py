@@ -75,6 +75,7 @@ class Participant(models.Model):
 
     # Sociodemographic information
     country = models.CharField(max_length=100, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     gender_other = models.CharField(max_length=100, null=True, blank=True)
@@ -84,17 +85,69 @@ class Participant(models.Model):
     career = models.CharField(max_length=200, null=True, blank=True)
     current_semester = models.CharField(max_length=50, choices=SEMESTER, null=True, blank=True)
     marital_status = models.CharField(max_length=20, choices=MARITAL_STATUS_CHOICES, null=True, blank=True)
-    mother_education_level = models.CharField(max_length=200, choices=EDUCATION_CHOICES, null=True, blank=True)
-    father_education_level = models.CharField(max_length=200, choices=EDUCATION_CHOICES, null=True, blank=True)
-    mother_age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
-    father_age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
+    #mother_education_level = models.CharField(max_length=200, choices=EDUCATION_CHOICES, null=True, blank=True)
+    #father_education_level = models.CharField(max_length=200, choices=EDUCATION_CHOICES, null=True, blank=True)
+    #mother_age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
+    #father_age = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(150)])
     gpa_last_semester = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
     repeated_cycles = models.BooleanField(default=False)
     repeated_cycles_count = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
     residence_sector = models.CharField(max_length=20, choices=RESIDENCE_SECTOR_CHOICES, null=True, blank=True)
     socioeconomic_level = models.CharField(max_length=20, choices=SOCIOECONOMIC_CHOICES, null=True, blank=True)
     income_sources = models.CharField(max_length=500, null=True, blank=True)  # Comma-separated or JSON
-    
+    # Conversational AI / Chatbot usage
+    uses_conversational_ai = models.BooleanField(null=True, blank=True)
+    ai_daily_hours_weekday = models.DecimalField(
+        max_digits=4, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(24)]
+    )
+    ai_daily_hours_weekend = models.DecimalField(
+        max_digits=4, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(24)]
+    )
+    ai_start_age = models.IntegerField(
+        null=True, blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(150)]
+    )
+    ai_use_purpose = models.CharField(max_length=500, null=True, blank=True)
+
+    # TikTok usage
+    has_tiktok_account = models.BooleanField(null=True, blank=True)
+    tiktok_daily_hours_weekday = models.DecimalField(
+        max_digits=4, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(24)]
+    )
+    tiktok_daily_hours_weekend = models.DecimalField(
+        max_digits=4, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(24)]
+    )
+    tiktok_start_age = models.IntegerField(
+        null=True, blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(150)]
+    )
+
+    # Instagram usage
+    has_instagram_account = models.BooleanField(null=True, blank=True)
+    instagram_daily_hours_weekday = models.DecimalField(
+        max_digits=4, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(24)]
+    )
+    instagram_daily_hours_weekend = models.DecimalField(
+        max_digits=4, decimal_places=2, null=True, blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(24)]
+    )
+    instagram_start_age = models.IntegerField(
+        null=True, blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(150)]
+    )
+
+    # Social context
+    parents_control_screen_time = models.BooleanField(null=True, blank=True)
+    has_stable_friend_group = models.BooleanField(null=True, blank=True)
+    has_frequent_positive_communication = models.BooleanField(null=True, blank=True)
+    participates_in_social_activities = models.BooleanField(null=True, blank=True)
+
+
     class Meta:
         db_table = 'participants'
         ordering = ['-created_at']
@@ -185,16 +238,16 @@ class UCLALoneliness(models.Model):
     q8 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
     q9 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
     q10 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q11 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q12 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q13 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q14 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q15 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q16 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q17 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q18 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q19 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
-    q20 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q11 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q12 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q13 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q14 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q15 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q16 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q17 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q18 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q19 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
+    #q20 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)])
     
     total_score = models.IntegerField(editable=False, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -282,7 +335,15 @@ class CAIDS(models.Model):
     q11 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     q12 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     q13 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
-    
+    q14 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    q15 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    q16 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    q17 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    q18 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    q19 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    q20 = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+
     total_score = models.IntegerField(editable=False, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     

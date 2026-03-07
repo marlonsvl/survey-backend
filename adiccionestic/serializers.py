@@ -59,6 +59,32 @@ class ParticipantSerializer(serializers.ModelSerializer):
             'residence_sector',
             'socioeconomic_level',
             'income_sources',
+
+            # Conversational AI usage
+            'uses_conversational_ai',
+            'ai_daily_hours_weekday',
+            'ai_daily_hours_weekend',
+            'ai_start_age',
+            'ai_use_purpose',
+
+            # TikTok usage
+            'has_tiktok_account',
+            'tiktok_daily_hours_weekday',
+            'tiktok_daily_hours_weekend',
+            'tiktok_start_age',
+
+            # Instagram usage
+            'has_instagram_account',
+            'instagram_daily_hours_weekday',
+            'instagram_daily_hours_weekend',
+            'instagram_start_age',
+
+            # Social context
+            'parents_control_screen_time',
+            'has_stable_friend_group',
+            'has_frequent_positive_communication',
+            'participates_in_social_activities',
+
             # Instruments
             'bergen_tiktok', 'bergen_instagram', 'ucla_loneliness',
             'prefrontal_symptoms', 'caids'
