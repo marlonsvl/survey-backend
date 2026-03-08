@@ -52,8 +52,6 @@ class ParticipantSerializer(serializers.ModelSerializer):
             'living_with', 'living_with_other',
             'university', 'career', 'current_semester',
             'marital_status',
-            'mother_education_level', 'father_education_level',
-            'mother_age', 'father_age',
             'gpa_last_semester',
             'repeated_cycles', 'repeated_cycles_count',
             'residence_sector',

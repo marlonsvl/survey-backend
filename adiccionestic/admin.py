@@ -35,9 +35,6 @@ class ParticipantAdmin(admin.ModelAdmin):
         ('Academic Information', {
             'fields': ('university', 'career', 'current_semester', 'gpa_last_semester', 'repeated_cycles', 'repeated_cycles_count')
         }),
-        ('Family Information', {
-            'fields': ('mother_education_level', 'father_education_level', 'mother_age', 'father_age')
-        }),
         ('Socioeconomic Information', {
             'fields': ('residence_sector', 'socioeconomic_level', 'income_sources')
         }),
@@ -121,8 +118,7 @@ class ParticipantAdmin(admin.ModelAdmin):
         headers = [
             'Email', 'Location', 'Country', 'Age', 'Gender', 'Gender Other',
             'Living With', 'Living With Other', 'University', 'Career',
-            'Current Semester', 'Marital Status', 'Mother Education',
-            'Father Education', 'Mother Age', 'Father Age', 'GPA Last Semester',
+            'Current Semester', 'Marital Status', 'GPA Last Semester',
             'Repeated Cycles', 'Repeated Cycles Count', 'Residence Sector',
             'Socioeconomic Level', 'Income Sources', 
              'uses_conversational_ai', 'ai_daily_hours_weekday', 'ai_daily_hours_weekend', 'ai_start_age', 'ai_use_purpose',
@@ -150,10 +146,6 @@ class ParticipantAdmin(admin.ModelAdmin):
                 participant.career or '',
                 participant.get_current_semester_display() if participant.current_semester else '',
                 participant.get_marital_status_display() if participant.marital_status else '',
-                participant.get_mother_education_level_display() if participant.mother_education_level else '',
-                participant.get_father_education_level_display() if participant.father_education_level else '',
-                participant.mother_age or '',
-                participant.father_age or '',
                 float(participant.gpa_last_semester) if participant.gpa_last_semester else '',
                 'Sí' if participant.repeated_cycles else 'No',
                 participant.repeated_cycles_count or '',
