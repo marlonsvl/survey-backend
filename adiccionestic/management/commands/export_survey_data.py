@@ -132,7 +132,12 @@ class Command(BaseCommand):
             'Current Semester', 'Marital Status', 'Mother Education',
             'Father Education', 'Mother Age', 'Father Age', 'GPA Last Semester',
             'Repeated Cycles', 'Repeated Cycles Count', 'Residence Sector',
-            'Socioeconomic Level', 'Income Sources', 'Consent Accepted',
+            'Socioeconomic Level', 'Income Sources', 
+             'uses_conversational_ai', 'ai_daily_hours_weekday', 'ai_daily_hours_weekend', 'ai_start_age', 'ai_use_purpose',
+             'has_tiktok_account', 'tiktok_daily_hours_weekday', 'tiktok_daily_hours_weekend', 'tiktok_start_age',
+             'has_instagram_account', 'instagram_daily_hours_weekday', 'instagram_daily_hours_weekend', 'instagram_start_age',
+             'parents_control_screen_time', 'has_stable_friend_group', 'has_frequent_positive_communication', 'participates_in_social_activities',
+              'Consent Accepted',
             'Consent Date', 'Feedback Sent', 'Created At'
         ]
         
@@ -162,6 +167,25 @@ class Command(BaseCommand):
                 participant.get_residence_sector_display() if participant.residence_sector else '',
                 participant.get_socioeconomic_level_display() if participant.socioeconomic_level else '',
                 participant.income_sources or '',
+
+                'Yes' if participant.uses_conversational_ai else 'No',
+                participant.ai_daily_hours_weekday if participant.uses_conversational_ai else '',
+                participant.ai_daily_hours_weekend if participant.uses_conversational_ai else '',
+                participant.ai_start_age if participant.uses_conversational_ai else '',
+                participant.ai_use_purpose if participant.uses_conversational_ai else '',
+                'Yes' if participant.has_tiktok_account else 'No',
+                participant.tiktok_daily_hours_weekday if participant.has_tiktok_account else '',
+                participant.tiktok_daily_hours_weekend if participant.has_tiktok_account else '',
+                participant.tiktok_start_age if participant.has_tiktok_account else '',
+                'Yes' if participant.has_instagram_account else 'No',
+                participant.instagram_daily_hours_weekday if participant.has_instagram_account else '',
+                participant.instagram_daily_hours_weekend if participant.has_instagram_account else '',
+                participant.instagram_start_age if participant.has_instagram_account else '',
+                'Yes' if participant.parents_control_screen_time else 'No',
+                'Yes' if participant.has_stable_friend_group else 'No',
+                'Yes' if participant.has_frequent_positive_communication else 'No',
+                'Yes' if participant.participates_in_social_activities else 'No',
+                
                 'Yes' if participant.consent_accepted else 'No',
                 participant.consent_date.strftime('%Y-%m-%d %H:%M:%S') if participant.consent_date else '',
                 'Yes' if participant.feedback_sent else 'No',
@@ -223,7 +247,7 @@ class Command(BaseCommand):
         """Create UCLA Loneliness sheet"""
         ws = wb.create_sheet("UCLA Loneliness")
         
-        headers = ['Email'] + [f'Q{i}' for i in range(1, 21)] + ['Total Score', 'Feedback', 'Created At']
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 11)] + ['Total Score', 'Feedback', 'Created At']
         self._write_header_row(ws, headers)
         
         for participant in queryset:
@@ -263,14 +287,14 @@ class Command(BaseCommand):
         """Create CAIDS sheet"""
         ws = wb.create_sheet("CAIDS")
         
-        headers = ['Email'] + [f'Q{i}' for i in range(1, 14)] + ['Total Score', 'Feedback', 'Created At']
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 21)] + ['Total Score', 'Feedback', 'Created At']
         self._write_header_row(ws, headers)
         
         for participant in queryset:
             if hasattr(participant, 'caids'):
                 caids = participant.caids
                 row = [participant.email]
-                row.extend([getattr(caids, f'q{i}') for i in range(1, 14)])
+                row.extend([getattr(caids, f'q{i}') for i in range(1, 21)])
                 row.extend([
                     caids.total_score, caids.get_feedback(),
                     caids.created_at.strftime('%Y-%m-%d %H:%M:%S')
