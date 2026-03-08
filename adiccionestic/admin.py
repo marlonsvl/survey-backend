@@ -382,20 +382,26 @@ class ParticipantAdmin(admin.ModelAdmin):
             cell.alignment = Alignment(horizontal='center', vertical='center')
     
     def _auto_adjust_column_width(self, ws):
-        """Auto-adjust column widths"""
+        """Auto-adjust column widths, skipping merged cells"""
         for column in ws.columns:
             max_length = 0
-            column_letter = column[0].column_letter
-            
+            column_letter = None
+
             for cell in column:
+                # Skip merged cells — they don't have column_letter
+                if cell.__class__.__name__ == 'MergedCell':
+                    continue
+                if column_letter is None:
+                    column_letter = cell.column_letter
                 try:
-                    if len(str(cell.value)) > max_length:
+                    if cell.value and len(str(cell.value)) > max_length:
                         max_length = len(str(cell.value))
                 except:
                     pass
-            
-            adjusted_width = min(max_length + 2, 50)
-            ws.column_dimensions[column_letter].width = adjusted_width
+
+            if column_letter:
+                adjusted_width = min(max_length + 2, 50)
+                ws.column_dimensions[column_letter].width = adjusted_width
 
 
 # Register models
