@@ -250,7 +250,7 @@ class Command(BaseCommand):
             if hasattr(participant, 'ucla_loneliness'):
                 ul = participant.ucla_loneliness
                 row = [participant.email]
-                row.extend([getattr(ul, f'q{i}') for i in range(1, 21)])
+                row.extend([getattr(ul, f'q{i}') for i in range(1, 11)])
                 row.extend([
                     ul.total_score, ul.get_feedback(),
                     ul.created_at.strftime('%Y-%m-%d %H:%M:%S')
