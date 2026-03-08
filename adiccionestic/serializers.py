@@ -91,34 +91,92 @@ class ParticipantSerializer(serializers.ModelSerializer):
         ]
 
 class SociodemographicDataSerializer(serializers.Serializer):
-    """Serializer for sociodemographic information"""
-    country = serializers.CharField(max_length=100, required=False, allow_blank=True)
-    age = serializers.IntegerField(required=False, min_value=1, max_value=150)
-    gender = serializers.ChoiceField(choices=['M', 'F', 'O'], required=False)
-    gender_other = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    """Serializer for sociodemographic information - matches all Participant model fields"""
+
+    # Personal
+    country = serializers.CharField(max_length=100, required=False, allow_blank=True, allow_null=True)
+    age = serializers.IntegerField(required=False, allow_null=True, min_value=1, max_value=150)
+    gender = serializers.ChoiceField(choices=['M', 'F', 'O'], required=False, allow_null=True)
+    gender_other = serializers.CharField(max_length=100, required=False, allow_blank=True, allow_null=True)
     living_with = serializers.ChoiceField(
-        choices=['alone', 'mother', 'father', 'both_parents', 'parents_siblings', 
-                'parents_siblings_grandparents', 'extended_family', 'other'],
-        required=False
+        choices=['alone', 'mother', 'father', 'both_parents', 'parents_siblings',
+                 'parents_siblings_grandparents', 'extended_family', 'other'],
+        required=False, allow_null=True
     )
-    living_with_other = serializers.CharField(max_length=200, required=False, allow_blank=True)
-    university = serializers.CharField(max_length=200, required=False, allow_blank=True)
-    career = serializers.CharField(max_length=200, required=False, allow_blank=True)
-    current_semester = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    living_with_other = serializers.CharField(max_length=200, required=False, allow_blank=True, allow_null=True)
     marital_status = serializers.ChoiceField(
         choices=['single', 'married', 'free_union', 'divorced', 'widowed', 'separated'],
-        required=False
+        required=False, allow_null=True
     )
-    mother_education_level = serializers.CharField(max_length=200, required=False, allow_blank=True)
-    father_education_level = serializers.CharField(max_length=200, required=False, allow_blank=True)
-    mother_age = serializers.IntegerField(required=False, min_value=1, max_value=150)
-    father_age = serializers.IntegerField(required=False, min_value=1, max_value=150)
-    gpa_last_semester = serializers.DecimalField(max_digits=5, decimal_places=2, required=False, min_value=0, max_value=100)
+
+    # Academic
+    university = serializers.CharField(max_length=200, required=False, allow_blank=True, allow_null=True)
+    career = serializers.CharField(max_length=200, required=False, allow_blank=True, allow_null=True)
+    current_semester = serializers.ChoiceField(
+        choices=['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+        required=False, allow_null=True
+    )
+    gpa_last_semester = serializers.DecimalField(
+        max_digits=5, decimal_places=2,
+        required=False, allow_null=True,
+        min_value=0, max_value=100
+    )
     repeated_cycles = serializers.BooleanField(required=False)
-    repeated_cycles_count = serializers.IntegerField(required=False, min_value=0)
-    residence_sector = serializers.ChoiceField(choices=['urban', 'rural'], required=False)
-    socioeconomic_level = serializers.ChoiceField(choices=['high', 'medium', 'low'], required=False)
-    income_sources = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    repeated_cycles_count = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+
+    # Socioeconomic
+    residence_sector = serializers.ChoiceField(choices=['urban', 'rural'], required=False, allow_null=True)
+    socioeconomic_level = serializers.ChoiceField(choices=['high', 'medium', 'low'], required=False, allow_null=True)
+    income_sources = serializers.CharField(max_length=500, required=False, allow_blank=True, allow_null=True)
+
+    # Conversational AI usage
+    uses_conversational_ai = serializers.BooleanField(required=False, allow_null=True)
+    ai_daily_hours_weekday = serializers.DecimalField(
+        max_digits=4, decimal_places=2,
+        required=False, allow_null=True,
+        min_value=0, max_value=24
+    )
+    ai_daily_hours_weekend = serializers.DecimalField(
+        max_digits=4, decimal_places=2,
+        required=False, allow_null=True,
+        min_value=0, max_value=24
+    )
+    ai_start_age = serializers.IntegerField(required=False, allow_null=True, min_value=1, max_value=150)
+    ai_use_purpose = serializers.CharField(max_length=500, required=False, allow_blank=True, allow_null=True)
+
+    # TikTok usage
+    has_tiktok_account = serializers.BooleanField(required=False, allow_null=True)
+    tiktok_daily_hours_weekday = serializers.DecimalField(
+        max_digits=4, decimal_places=2,
+        required=False, allow_null=True,
+        min_value=0, max_value=24
+    )
+    tiktok_daily_hours_weekend = serializers.DecimalField(
+        max_digits=4, decimal_places=2,
+        required=False, allow_null=True,
+        min_value=0, max_value=24
+    )
+    tiktok_start_age = serializers.IntegerField(required=False, allow_null=True, min_value=1, max_value=150)
+
+    # Instagram usage
+    has_instagram_account = serializers.BooleanField(required=False, allow_null=True)
+    instagram_daily_hours_weekday = serializers.DecimalField(
+        max_digits=4, decimal_places=2,
+        required=False, allow_null=True,
+        min_value=0, max_value=24
+    )
+    instagram_daily_hours_weekend = serializers.DecimalField(
+        max_digits=4, decimal_places=2,
+        required=False, allow_null=True,
+        min_value=0, max_value=24
+    )
+    instagram_start_age = serializers.IntegerField(required=False, allow_null=True, min_value=1, max_value=150)
+
+    # Social context
+    parents_control_screen_time = serializers.BooleanField(required=False, allow_null=True)
+    has_stable_friend_group = serializers.BooleanField(required=False, allow_null=True)
+    has_frequent_positive_communication = serializers.BooleanField(required=False, allow_null=True)
+    participates_in_social_activities = serializers.BooleanField(required=False, allow_null=True)
 
 
 

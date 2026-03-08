@@ -224,7 +224,7 @@ class BergenInstagram(models.Model):
 
 
 class UCLALoneliness(models.Model):
-    """UCLA Loneliness Scale (20 items, 1-4 Likert scale)"""
+    """UCLA Loneliness Scale (10 items, 1-4 Likert scale)"""
     participant = models.OneToOneField(Participant, on_delete=models.CASCADE, related_name='ucla_loneliness')
     
     # 20 items from UCLA Loneliness Scale
@@ -257,14 +257,14 @@ class UCLALoneliness(models.Model):
     
     def save(self, *args, **kwargs):
         self.total_score = sum([
-            getattr(self, f'q{i}') for i in range(1, 21)
+            getattr(self, f'q{i}') for i in range(1, 11)
         ])
         super().save(*args, **kwargs)
     
     def get_feedback(self):
-        if self.total_score <= 35:
+        if self.total_score <= 25:
             return "Nivel bajo de soledad"
-        elif self.total_score <= 50:
+        elif self.total_score <= 34:
             return "Nivel moderado de soledad"
         else:
             return "Nivel alto de soledad"
@@ -318,7 +318,7 @@ class PrefrontalSymptoms(models.Model):
 
 
 class CAIDS(models.Model):
-    """Conversational AI Dependency Scale (13 items, 1-5 Likert scale)"""
+    """Conversational AI Dependency Scale (20 items, 1-5 Likert scale)"""
     participant = models.OneToOneField(Participant, on_delete=models.CASCADE, related_name='caids')
     
     # 13 items from CAIDS
@@ -352,7 +352,7 @@ class CAIDS(models.Model):
     
     def save(self, *args, **kwargs):
         self.total_score = sum([
-            getattr(self, f'q{i}') for i in range(1, 14)
+            getattr(self, f'q{i}') for i in range(1, 21)
         ])
         super().save(*args, **kwargs)
     

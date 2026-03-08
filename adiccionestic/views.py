@@ -289,14 +289,14 @@ class SurveyViewSet(viewsets.ModelViewSet):
         """Create UCLA Loneliness sheet"""
         ws = wb.create_sheet("UCLA Loneliness")
         
-        headers = ['Email'] + [f'Q{i}' for i in range(1, 10)] + ['Total Score', 'Feedback', 'Created At']
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 11)] + ['Total Score', 'Feedback', 'Created At']
         self._write_header_row(ws, headers)
         
         for participant in queryset:
             if hasattr(participant, 'ucla_loneliness'):
                 ul = participant.ucla_loneliness
                 row = [participant.email]
-                row.extend([getattr(ul, f'q{i}') for i in range(1, 21)])
+                row.extend([getattr(ul, f'q{i}') for i in range(1, 11)])
                 row.extend([
                     ul.total_score, ul.get_feedback(),
                     ul.created_at.strftime('%Y-%m-%d %H:%M:%S')
@@ -329,14 +329,14 @@ class SurveyViewSet(viewsets.ModelViewSet):
         """Create CAIDS sheet"""
         ws = wb.create_sheet("CAIDS")
         
-        headers = ['Email'] + [f'Q{i}' for i in range(1, 20)] + ['Total Score', 'Feedback', 'Created At']
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 21)] + ['Total Score', 'Feedback', 'Created At']
         self._write_header_row(ws, headers)
         
         for participant in queryset:
             if hasattr(participant, 'caids'):
                 caids = participant.caids
                 row = [participant.email]
-                row.extend([getattr(caids, f'q{i}') for i in range(1, 14)])
+                row.extend([getattr(caids, f'q{i}') for i in range(1, 21)])
                 row.extend([
                     caids.total_score, caids.get_feedback(),
                     caids.created_at.strftime('%Y-%m-%d %H:%M:%S')
