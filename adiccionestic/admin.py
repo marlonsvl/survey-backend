@@ -245,7 +245,7 @@ class ParticipantAdmin(admin.ModelAdmin):
         """Create sheet for UCLA Loneliness data"""
         ws = wb.create_sheet("UCLA Loneliness")
         
-        headers = ['Email'] + [f'Q{i}' for i in range(1, 10)] + ['Total Score', 'Feedback', 'Created At']
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 11)] + ['Total Score', 'Feedback', 'Created At']
         
         self._write_header_row(ws, headers)
         
@@ -253,7 +253,7 @@ class ParticipantAdmin(admin.ModelAdmin):
             if hasattr(participant, 'ucla_loneliness'):
                 ul = participant.ucla_loneliness
                 row = [participant.email]
-                row.extend([getattr(ul, f'q{i}') for i in range(1, 21)])
+                row.extend([getattr(ul, f'q{i}') for i in range(1, 11)])
                 row.extend([
                     ul.total_score,
                     ul.get_feedback(),
@@ -267,7 +267,7 @@ class ParticipantAdmin(admin.ModelAdmin):
         """Create sheet for Prefrontal Symptoms data"""
         ws = wb.create_sheet("Prefrontal Symptoms")
         
-        headers = ['Email'] + [f'Q{i}' for i in range(1, 20)] + ['Total Score', 'Feedback', 'Created At']
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 21)] + ['Total Score', 'Feedback', 'Created At']
         
         self._write_header_row(ws, headers)
         
@@ -289,7 +289,7 @@ class ParticipantAdmin(admin.ModelAdmin):
         """Create sheet for CAIDS data"""
         ws = wb.create_sheet("CAIDS")
         
-        headers = ['Email'] + [f'Q{i}' for i in range(1, 20)] + ['Total Score', 'Feedback', 'Created At']
+        headers = ['Email'] + [f'Q{i}' for i in range(1, 21)] + ['Total Score', 'Feedback', 'Created At']
         
         self._write_header_row(ws, headers)
         
@@ -297,7 +297,7 @@ class ParticipantAdmin(admin.ModelAdmin):
             if hasattr(participant, 'caids'):
                 caids = participant.caids
                 row = [participant.email]
-                row.extend([getattr(caids, f'q{i}') for i in range(1, 14)])
+                row.extend([getattr(caids, f'q{i}') for i in range(1, 21)])
                 row.extend([
                     caids.total_score,
                     caids.get_feedback(),
